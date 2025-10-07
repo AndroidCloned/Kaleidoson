@@ -12029,6 +12029,7 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                 shift_modifier = modifiers == Qt.KeyboardModifier.ShiftModifier # SHIFT
                 control_alt_modifier = modifiers == (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.AltModifier)
                 control_shift_modifier = modifiers == (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier)
+                control_alt_shift_modifier = modifiers == (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.AltModifier | Qt.KeyboardModifier.ShiftModifier)
                 #meta_modifier = modifiers == Qt.KeyboardModifier.MetaModifier # Control on macOS, Meta on Windows
                 #uncomment next line to find the integer value of a k
                 #print(k,event.text())
@@ -12387,6 +12388,34 @@ class ApplicationWindow(QMainWindow): # pyrefly:ignore[invalid-inheritance] # py
                     if not self.qmc.designerflag and self.comparator is None:
                         self.quickEventShortCut = (3,'')
                         self.sendmessage(self.qmc.etypes[3], append=False)
+                # Kaleido keyboard shortcuts for burner, air, and drum control
+                elif k == Qt.Key.Key_N: # N (burner down)
+                    if self.qmc.device == 138 and self.kaleido is not None:
+                        self.kaleidoSendMessageAwaitSignal.emit('HP', 'DW', 3, -1)  # eventtype=3 for slider/graph sync
+                        self.sendmessage('Burner: DOWN', append=False)
+                elif k == Qt.Key.Key_M: # M (burner up)
+                    if self.qmc.device == 138 and self.kaleido is not None:
+                        # Only initialize heating system if not already active (allows burner to go past 5%)
+                        if not hasattr(self.kaleido, 'HS') or self.kaleido.HS != 1:
+                            self.kaleidoSendMessageSignal.emit('HS', '1')  # Start heating system only if needed
+                        self.kaleidoSendMessageAwaitSignal.emit('HP', 'UP', 3, -1)  # eventtype=3 for slider/graph sync
+                        self.sendmessage('Burner: UP', append=False)
+                elif k == Qt.Key.Key_Comma: # , (drum down)
+                    if self.qmc.device == 138 and self.kaleido is not None:
+                        self.kaleidoSendMessageAwaitSignal.emit('RC', 'DW', 1, -1)
+                        self.sendmessage('Drum: DOWN', append=False)
+                elif k == Qt.Key.Key_Period: # . (drum up)
+                    if self.qmc.device == 138 and self.kaleido is not None:
+                        self.kaleidoSendMessageAwaitSignal.emit('RC', 'UP', 1, -1)
+                        self.sendmessage('Drum: UP', append=False)
+                elif k == Qt.Key.Key_K: # K (air down)
+                    if self.qmc.device == 138 and self.kaleido is not None:
+                        self.kaleidoSendMessageAwaitSignal.emit('FC', 'DW', 0, -1)
+                        self.sendmessage('Air: DOWN', append=False)
+                elif k == Qt.Key.Key_Apostrophe: # ' (air up)
+                    if self.qmc.device == 138 and self.kaleido is not None:
+                        self.kaleidoSendMessageAwaitSignal.emit('FC', 'UP', 0, -1)
+                        self.sendmessage('Air: UP', append=False)
                 elif k == Qt.Key.Key_V: # 86:                          #V (set SV)
                     if not self.qmc.designerflag and self.comparator is None:
                         self.quickEventShortCut = (4,'')
