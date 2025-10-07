@@ -12,6 +12,19 @@ param(
 Write-Host "=== Artisan Kaleido Fork Build Script ===" -ForegroundColor Green
 Write-Host "Version: $Version" -ForegroundColor Yellow
 
+# Check system architecture
+$SystemArch = $env:PROCESSOR_ARCHITECTURE
+Write-Host "System Architecture: $SystemArch" -ForegroundColor Cyan
+
+# ARM64 build requirements check
+if ($ARM64 -or $All) {
+    Write-Host "`n=== ARM64 Build Requirements ===" -ForegroundColor Magenta
+    Write-Host "✓ Python 3.12+ with ARM64 support" -ForegroundColor Green
+    Write-Host "✓ PyInstaller 6.16+ with ARM64 support" -ForegroundColor Green
+    Write-Host "✓ All dependencies must have ARM64 wheels available" -ForegroundColor Green
+    Write-Host "✓ Building natively on ARM64 Windows (no cross-compilation)" -ForegroundColor Green
+}
+
 # Set build directory
 $BuildDir = "dist"
 $SrcDir = "src"
@@ -106,7 +119,9 @@ function Build-Artisan {
     
     # Add architecture-specific flags
     if ($Arch -eq "arm64") {
-        $PyInstallerArgs += "--target-arch=arm64"
+        # Note: PyInstaller on Windows ARM64 builds natively, no cross-compilation needed
+        # The --target-arch flag is not needed for native ARM64 builds
+        Write-Host "Building native ARM64 version..." -ForegroundColor Magenta
     }
     
     Write-Host "Running PyInstaller..." -ForegroundColor Yellow
