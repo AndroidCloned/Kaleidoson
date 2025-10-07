@@ -13,7 +13,7 @@ types-docutils>=0.22.2.20250924
 types-xlrd>=2.0.0.20250914
 lxml-stubs>=0.5.1
 mypy==1.18.2
-pyright==1.1.405
+pyright==1.1.406
 ruff>=0.13.2
 pylint==3.3.8
 pre-commit>=4.3.0
