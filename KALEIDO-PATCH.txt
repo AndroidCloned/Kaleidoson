@@ -1,0 +1,50 @@
+# Kaleido Keyboard Shortcuts - Simple Patch
+
+## Quick Implementation
+
+Add this code to `src/artisanlib/main.py` in the `keyPressEvent` method, after the existing quick event shortcuts:
+
+```python
+                # Kaleido keyboard shortcuts for burner, air, and drum control
+                elif k == Qt.Key.Key_N: # N (burner down)
+                    if self.qmc.device == 138 and self.kaleido is not None:
+                        self.kaleidoSendMessageAwaitSignal.emit('HP', 'DW', 3, -1)
+                        self.sendmessage('Burner: DOWN', append=False)
+                elif k == Qt.Key.Key_M: # M (burner up)
+                    if self.qmc.device == 138 and self.kaleido is not None:
+                        if not hasattr(self.kaleido, 'HS') or self.kaleido.HS != 1:
+                            self.kaleidoSendMessageSignal.emit('HS', '1')
+                        self.kaleidoSendMessageAwaitSignal.emit('HP', 'UP', 3, -1)
+                        self.sendmessage('Burner: UP', append=False)
+                elif k == Qt.Key.Key_Comma: # , (drum down)
+                    if self.qmc.device == 138 and self.kaleido is not None:
+                        self.kaleidoSendMessageAwaitSignal.emit('RC', 'DW', 1, -1)
+                        self.sendmessage('Drum: DOWN', append=False)
+                elif k == Qt.Key.Key_Period: # . (drum up)
+                    if self.qmc.device == 138 and self.kaleido is not None:
+                        self.kaleidoSendMessageAwaitSignal.emit('RC', 'UP', 1, -1)
+                        self.sendmessage('Drum: UP', append=False)
+                elif k == Qt.Key.Key_K: # K (air down)
+                    if self.qmc.device == 138 and self.kaleido is not None:
+                        self.kaleidoSendMessageAwaitSignal.emit('FC', 'DW', 0, -1)
+                        self.sendmessage('Air: DOWN', append=False)
+                elif k == Qt.Key.Key_Apostrophe: # ' (air up)
+                    if self.qmc.device == 138 and self.kaleido is not None:
+                        self.kaleidoSendMessageAwaitSignal.emit('FC', 'UP', 0, -1)
+                        self.sendmessage('Air: UP', append=False)
+```
+
+## Keyboard Shortcuts Summary
+
+- **N**: Burner down
+- **M**: Burner up (with smart HS,1 initialization)
+- **K**: Air down  
+- **'**: Air up
+- **,**: Drum down
+- **.**: Drum up
+
+## Requirements
+
+- Kaleido roaster connected (device ID 138)
+- Active Kaleido communication (`self.kaleido` not None)
+- Keys must not conflict with existing Artisan shortcuts
